@@ -1,0 +1,176 @@
+{
+  "version": "5",
+  "team": {
+    "name": "AI싱크클럽 성장 전략팀",
+    "description": "AI싱크클럽 사업 레버리지를 위한 AI 전략 에이전트 팀 — 커머스(월1.5억) + 유튜브(AI+커머스) + SaaS(ai-team-saas) 3개 사업을 통합 관리하여 시간/지식/콘텐츠/데이터를 수익으로 전환"
+  },
+  "gateway": {
+    "port": 18790,
+    "cors": true
+  },
+  "agents": [
+    {
+      "id": "strategy",
+      "name": "전략봇",
+      "role": "팀장 — 3개 사업 통합 전략 조율, 우선순위 관리, 업무 라우팅",
+      "workspace": "workspace-strategy",
+      "telegram": {
+        "botToken": "${TELEGRAM_BOT_TOKEN_STRATEGY}",
+        "allowedUsers": ["${OWNER_TELEGRAM_ID}"],
+        "groupId": "${TELEGRAM_GROUP_ID}",
+        "topicId": "${TOPIC_STRATEGY}"
+      },
+      "model": {
+        "primary": "openai-codex/gpt-5.3-codex-spark",
+        "fallback": [
+          "openai-codex/gpt-5.3-codex",
+          "openai/gpt-5",
+          "anthropic/claude-sonnet-4-6"
+        ],
+        "temperature": 0.3
+      },
+      "tools": [
+        "sessions_send",
+        "sessions_list",
+        "file_read",
+        "file_write",
+        "web_search"
+      ],
+      "heartbeat": {
+        "interval": "30m",
+        "activeHours": "07:00-22:00",
+        "timezone": "Asia/Seoul"
+      }
+    },
+    {
+      "id": "research",
+      "name": "리서치봇",
+      "role": "시장조사 — 트렌드 스캔, 경쟁자 분석, AI 도구 발굴, 딥다이브 리포트",
+      "workspace": "workspace-research",
+      "telegram": {
+        "botToken": "${TELEGRAM_BOT_TOKEN_RESEARCH}",
+        "allowedUsers": ["${OWNER_TELEGRAM_ID}"],
+        "groupId": "${TELEGRAM_GROUP_ID}",
+        "topicId": "${TOPIC_RESEARCH}"
+      },
+      "model": {
+        "primary": "openai-codex/gpt-5.3-codex",
+        "fallback": [
+          "openai/gpt-5.2",
+          "openai/gpt-5",
+          "anthropic/claude-sonnet-4-6"
+        ],
+        "temperature": 0.4
+      },
+      "tools": [
+        "sessions_send",
+        "file_read",
+        "file_write",
+        "web_search"
+      ],
+      "heartbeat": {
+        "interval": "60m",
+        "activeHours": "07:00-22:00",
+        "timezone": "Asia/Seoul"
+      }
+    },
+    {
+      "id": "content",
+      "name": "콘텐츠봇",
+      "role": "유튜브 콘텐츠 — 기획, 스크립트, SEO 키워드, 썸네일 컨셉, 퍼널 연결",
+      "workspace": "workspace-content",
+      "telegram": {
+        "botToken": "${TELEGRAM_BOT_TOKEN_CONTENT}",
+        "allowedUsers": ["${OWNER_TELEGRAM_ID}"],
+        "groupId": "${TELEGRAM_GROUP_ID}",
+        "topicId": "${TOPIC_CONTENT}"
+      },
+      "model": {
+        "primary": "openai-codex/gpt-5.3-codex",
+        "fallback": [
+          "openai/gpt-5.2",
+          "openai/gpt-5",
+          "anthropic/claude-sonnet-4-6"
+        ],
+        "temperature": 0.5
+      },
+      "tools": [
+        "sessions_send",
+        "file_read",
+        "file_write",
+        "web_search",
+        "calculator"
+      ],
+      "heartbeat": {
+        "interval": "60m",
+        "activeHours": "08:00-21:00",
+        "timezone": "Asia/Seoul"
+      }
+    },
+    {
+      "id": "funnel",
+      "name": "퍼널봇",
+      "role": "수익 전환 — 리드 마그넷 설계, 퍼널 최적화, 수익 상품 설계, 전환율 추적",
+      "workspace": "workspace-funnel",
+      "telegram": {
+        "botToken": "${TELEGRAM_BOT_TOKEN_FUNNEL}",
+        "allowedUsers": ["${OWNER_TELEGRAM_ID}"],
+        "groupId": "${TELEGRAM_GROUP_ID}",
+        "topicId": "${TOPIC_FUNNEL}"
+      },
+      "model": {
+        "primary": "openai-codex/gpt-5.3-codex",
+        "fallback": [
+          "openai/gpt-5.2",
+          "openai/gpt-5",
+          "anthropic/claude-sonnet-4-6"
+        ],
+        "temperature": 0.3
+      },
+      "tools": [
+        "sessions_send",
+        "file_read",
+        "file_write",
+        "calculator",
+        "web_search"
+      ],
+      "heartbeat": {
+        "interval": "60m",
+        "activeHours": "07:00-22:00",
+        "timezone": "Asia/Seoul"
+      }
+    },
+    {
+      "id": "analysis",
+      "name": "분석봇",
+      "role": "데이터 분석 — 3개 사업 통합 대시보드, P&L, ROI 추적, 이상치 감지",
+      "workspace": "workspace-analysis",
+      "telegram": {
+        "botToken": "${TELEGRAM_BOT_TOKEN_ANALYSIS}",
+        "allowedUsers": ["${OWNER_TELEGRAM_ID}"],
+        "groupId": "${TELEGRAM_GROUP_ID}",
+        "topicId": "${TOPIC_ANALYSIS}"
+      },
+      "model": {
+        "primary": "openai-codex/gpt-5.3-codex-spark",
+        "fallback": [
+          "openai-codex/gpt-5.3-codex",
+          "openai/gpt-5-nano",
+          "anthropic/claude-sonnet-4-6"
+        ],
+        "temperature": 0.1
+      },
+      "tools": [
+        "sessions_send",
+        "file_read",
+        "file_write",
+        "calculator"
+      ],
+      "heartbeat": {
+        "interval": "60m",
+        "activeHours": "07:00-22:00",
+        "timezone": "Asia/Seoul"
+      }
+    }
+  ]
+}
