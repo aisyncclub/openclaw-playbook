@@ -297,34 +297,97 @@ function Sidebar({ current, onSelect, open, onClose, theme, onToggleTheme }: {
 }
 
 /* ============================================================
-   CHAPTER NAV — 완료 배너 추가
+   STEP VIEW — h2 기준으로 섹션 분리, 한 번에 하나 표시
    ============================================================ */
-function ChapterNav({ current, onSelect }: { current: number; onSelect: (i: number) => void }) {
-  const prev = current > 0 ? chapters[current - 1] : null;
-  const next = current < chapters.length - 1 ? chapters[current + 1] : null;
-  const ch = chapters[current];
+function splitIntoSections(html: string): string[] {
+  // Split by <h2> tags, keeping the h2 with its section
+  const parts = html.split(/(?=<h2>)/);
+  if (parts.length <= 1) return [html]; // no h2 splits, show all
+
+  // First part (before first h2) = intro/header section
+  const sections: string[] = [];
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (trimmed) sections.push(trimmed);
+  }
+  return sections;
+}
+
+function StepView({ html, chapterIdx, onChapterChange }: {
+  html: string;
+  chapterIdx: number;
+  onChapterChange: (i: number) => void;
+}) {
+  const sections = useMemo(() => splitIntoSections(html), [html]);
+  const [step, setStep] = useState(0);
+
+  // Reset step when chapter changes
+  useEffect(() => { setStep(0); }, [chapterIdx]);
+
+  const total = sections.length;
+  const isLast = step >= total - 1;
+  const isFirst = step === 0;
+  const ch = chapters[chapterIdx];
+  const nextCh = chapterIdx < chapters.length - 1 ? chapters[chapterIdx + 1] : null;
+  const prevCh = chapterIdx > 0 ? chapters[chapterIdx - 1] : null;
+
+  const goNext = () => {
+    if (isLast) {
+      if (nextCh) onChapterChange(chapterIdx + 1);
+    } else {
+      setStep(s => s + 1);
+      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    }
+  };
+
+  const goPrev = () => {
+    if (isFirst) {
+      if (prevCh) onChapterChange(chapterIdx - 1);
+    } else {
+      setStep(s => s - 1);
+      window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+    }
+  };
+
+  // Progress within chapter
+  const progress = total > 1 ? ((step + 1) / total) * 100 : 100;
 
   return (
-    <div className="chapter-nav-wrap">
-      {/* 완료 배너 */}
-      {next && (
-        <div className="chapter-complete" onClick={() => onSelect(current + 1)}>
-          ✅ {ch.num ? `Ch.${ch.num}` : ""} {ch.title} 완료! &nbsp;→&nbsp; 다음: {next.num ? `Ch.${next.num}` : ""} {next.title}
+    <div className="content-wrap">
+      {/* Chapter step progress bar */}
+      <div className="step-progress-bar">
+        <div className="step-progress-fill" style={{ width: `${progress}%` }} />
+      </div>
+      <div className="step-progress-info">
+        <span>{ch.num ? `Ch.${ch.num}` : ""} {ch.title}</span>
+        <span>{step + 1} / {total}</span>
+      </div>
+
+      {/* Content */}
+      <main
+        className="content"
+        dangerouslySetInnerHTML={{ __html: sections[step] || "" }}
+      />
+
+      {/* Bottom navigation */}
+      <div className="step-nav">
+        <button className="step-nav-btn prev" onClick={goPrev} disabled={isFirst && !prevCh}>
+          ← {isFirst ? (prevCh ? `${prevCh.title}` : "") : "이전"}
+        </button>
+
+        <div className="step-dots">
+          {sections.map((_, i) => (
+            <div
+              key={i}
+              className={`step-dot ${i === step ? "active" : ""} ${i < step ? "done" : ""}`}
+              onClick={() => { setStep(i); window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior }); }}
+            />
+          ))}
         </div>
-      )}
-      <div className="chapter-nav">
-        {prev ? (
-          <div className="ch-nav-btn prev" onClick={() => onSelect(current - 1)}>
-            <span className="ch-nav-label">← 이전</span>
-            <span className="ch-nav-title">{prev.num ? `Ch.${prev.num}` : ""} {prev.title}</span>
-          </div>
-        ) : <div />}
-        {next ? (
-          <div className="ch-nav-btn next" onClick={() => onSelect(current + 1)}>
-            <span className="ch-nav-label">다음 →</span>
-            <span className="ch-nav-title">{next.num ? `Ch.${next.num}` : ""} {next.title}</span>
-          </div>
-        ) : <div />}
+
+        <button className="step-nav-btn next" onClick={goNext}>
+          {isLast ? (nextCh ? `${nextCh.title} →` : "완료!") : "다음 →"}
+        </button>
       </div>
     </div>
   );
@@ -437,7 +500,7 @@ function App() {
 
   return (
     <>
-      <div className="progress-bar" style={{ width: `${scrollProgress}%` }} />
+      {isIntro && <div className="progress-bar" style={{ width: `${scrollProgress}%` }} />}
 
       <div className="mobile-bar">
         <button onClick={() => setSidebarOpen(true)}>☰</button>
@@ -460,10 +523,7 @@ function App() {
         {isIntro ? (
           <IntroPage onStart={goTo} />
         ) : (
-          <div className="content-wrap">
-            <main className="content" dangerouslySetInnerHTML={{ __html: rendered }} />
-            <ChapterNav current={current} onSelect={goTo} />
-          </div>
+          <StepView html={rendered} chapterIdx={current} onChapterChange={goTo} />
         )}
       </div>
     </>
