@@ -1263,6 +1263,54 @@ body::after {
 }
 
 /* ================================================================
+   AUTO-COLLAPSED ADVANCED SECTIONS
+   ================================================================ */
+.advanced-section {
+  margin-top: 48px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+.advanced-section summary {
+  padding: 16px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  list-style: none;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.advanced-section summary:hover {
+  color: var(--text);
+}
+
+.advanced-section summary::marker,
+.advanced-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-section[open] summary {
+  color: var(--text);
+}
+
+.advanced-content {
+  padding: 24px;
+}
+
+.advanced-content h2 {
+  margin-top: 24px !important;
+}
+
+.advanced-content h2:first-child {
+  margin-top: 0 !important;
+}
+
+/* ================================================================
    SCROLLBAR
    ================================================================ */
 ::-webkit-scrollbar { width: 6px; }

@@ -69,6 +69,19 @@ function parseMarkdown(md: string): string {
   html = html.replace(/<p>\s*<\/p>/g, "");
   html = html.replace(/<p><\/p>/g, "");
   html = html.replace(/%%CODEBLOCK_(\d+)%%/g, (_m, idx) => codeBlocks[parseInt(idx)]);
+
+  // Auto-collapse "심화" sections into <details>
+  // Detect the separator pattern: "여기부터 심화 내용입니다"
+  html = html.replace(
+    /<blockquote>(.{0,10})<strong>여기부터 심화 내용입니다\.<\/strong>(.+?)<\/blockquote>/g,
+    `<details class="advanced-section"><summary>📚 심화 내용 보기 (선택사항 — 기본은 여기까지면 충분합니다)</summary><div class="advanced-content">`
+  );
+
+  // Close the details at the end of content (or next chapter nav)
+  if (html.includes('<details class="advanced-section">') && !html.includes('</details>')) {
+    html += `</div></details>`;
+  }
+
   return html;
 }
 
