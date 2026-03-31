@@ -828,11 +828,6 @@ body::after {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 0 48px 72px;
-  border-top: 2px solid var(--border);
-  padding-top: 28px;
 }
 
 .ch-nav-btn {
@@ -943,9 +938,345 @@ body::after {
 }
 
 /* ================================================================
+   NEW INTRO COMPONENTS
+   ================================================================ */
+
+/* What is OpenClaw */
+.what-is {
+  margin-bottom: 44px;
+}
+
+.what-is h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.what-is-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.what-is-card {
+  flex: 1;
+  max-width: 280px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  text-align: center;
+}
+
+.what-is-card.active {
+  border-color: var(--text);
+  border-width: 2px;
+  background: var(--bg-hover);
+}
+
+.what-is-label {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.what-is-card.active .what-is-label { color: var(--text); }
+
+.what-is-desc {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.what-is-desc span {
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.what-is-vs {
+  font-size: 24px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Cost Preview */
+.cost-preview {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 44px;
+  text-align: center;
+}
+
+.cost-preview h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.cost-chips {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.cost-chip {
+  padding: 12px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.cost-chip strong {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.cost-chip span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cost-note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Hero desc */
+.hero-desc {
+  font-size: 14px;
+  opacity: 0.7;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* 3-Step Roadmap */
+.roadmap-simple {
+  margin-bottom: 44px;
+}
+
+.roadmap-simple h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.step:hover {
+  border-color: var(--text);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.step-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.step-info {
+  flex: 1;
+}
+
+.step-info h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.step-info p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.step-arrow {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+/* CTA sub */
+.cta-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+/* Full TOC (collapsed) */
+.full-toc {
+  margin-top: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.full-toc summary {
+  padding: 16px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.full-toc summary::before {
+  content: "▸ ";
+}
+
+.full-toc[open] summary::before {
+  content: "▾ ";
+}
+
+.toc-grid {
+  padding: 0 24px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.toc-phase h4 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.toc-item {
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.toc-item:hover {
+  color: var(--text);
+}
+
+/* ================================================================
+   SIDEBAR ACCORDION
+   ================================================================ */
+.sidebar-phase-group {
+  margin-bottom: 2px;
+}
+
+.sidebar-phase-header {
+  padding: 10px 22px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s;
+}
+
+.sidebar-phase-header:hover { color: var(--text); }
+.sidebar-phase-header.active { color: var(--text); }
+
+.phase-toggle {
+  font-size: 10px;
+  width: 14px;
+}
+
+.sidebar-phase-items {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+
+/* ================================================================
+   CHAPTER COMPLETE BANNER
+   ================================================================ */
+.chapter-nav-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 48px 72px;
+}
+
+.chapter-complete {
+  padding: 16px 24px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.chapter-complete:hover {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* ================================================================
    SCROLLBAR
    ================================================================ */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ================================================================
+   MOBILE OVERRIDES for new components
+   ================================================================ */
+@media (max-width: 768px) {
+  .what-is-grid { flex-direction: column; }
+  .what-is-vs { transform: rotate(90deg); }
+  .cost-chips { flex-direction: column; align-items: center; }
+  .toc-grid { grid-template-columns: 1fr; }
+  .chapter-nav-wrap { padding: 0 20px 60px; }
+}

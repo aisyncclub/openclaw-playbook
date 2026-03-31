@@ -34,8 +34,6 @@ const chapters: Chapter[] = [
 
 function parseMarkdown(md: string): string {
   let html = md;
-
-  // Step 1: Extract code blocks into placeholders (protect from further parsing)
   const codeBlocks: string[] = [];
   html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (_m, lang, code) => {
     const escaped = code.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n{3,}/g, "\n\n").trimEnd();
@@ -43,9 +41,6 @@ function parseMarkdown(md: string): string {
     codeBlocks.push(`<pre><code class="lang-${lang}">${escaped}</code></pre>`);
     return `\n%%CODEBLOCK_${idx}%%\n`;
   });
-
-  // Step 2: Parse everything else (code blocks are safe as placeholders)
-  // Tables
   html = html.replace(/^(\|.+\|)\n(\|[-| :]+\|)\n((?:\|.+\|\n?)*)/gm, (_m, header, _sep, body) => {
     const ths = header.split("|").filter((c: string) => c.trim()).map((c: string) => `<th>${c.trim()}</th>`).join("");
     const rows = body.trim().split("\n").map((row: string) => {
@@ -54,120 +49,105 @@ function parseMarkdown(md: string): string {
     }).join("");
     return `<table><thead><tr>${ths}</tr></thead><tbody>${rows}</tbody></table>`;
   });
-  // Headings
   html = html.replace(/^#### (.+)$/gm, "<h4>$1</h4>");
   html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
   html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
   html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
   html = html.replace(/^---$/gm, "<hr>");
-  // Blockquotes
   html = html.replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>");
   html = html.replace(/<\/blockquote>\n<blockquote>/g, "\n");
-  // Lists
   html = html.replace(/^- \[x\] (.+)$/gm, '<li><input type="checkbox" checked disabled> $1</li>');
   html = html.replace(/^- \[ \] (.+)$/gm, '<li><input type="checkbox" disabled> $1</li>');
   html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
   html = html.replace(/(<li>.*<\/li>\n?)+/g, (m) => `<ul>${m}</ul>`);
   html = html.replace(/^\d+\. (.+)$/gm, "<li>$1</li>");
-  // Inline
   html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
   html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
-  // Paragraphs
   html = html.replace(/^(?!<[hupoltba]|<\/|<li|<hr|<pre|<code|<table|<thead|<tbody|<tr|<td|<th|<blockquote|%%CODEBLOCK)(.+)$/gm, "<p>$1</p>");
   html = html.replace(/<p>\s*<\/p>/g, "");
   html = html.replace(/<p><\/p>/g, "");
-
-  // Step 3: Restore code blocks from placeholders
   html = html.replace(/%%CODEBLOCK_(\d+)%%/g, (_m, idx) => codeBlocks[parseInt(idx)]);
-
   return html;
 }
 
 /* ============================================================
-   INTRO PAGE
+   INTRO — 완전 리뉴얼: 초보 친화 + OpenClaw 설명
    ============================================================ */
 function IntroPage({ onStart }: { onStart: (i: number) => void }) {
   return (
     <div className="intro-wrap">
       <div className="intro">
-        {/* Hero */}
+        {/* Hero — OpenClaw 설명 포함 */}
         <div className="hero">
           <div className="hero-eyebrow">AI싱크클럽</div>
           <h1>OpenClaw 실전 매뉴얼</h1>
           <div className="subtitle">
-            AI 에이전트를 만들고, 팀으로 구성하고,<br />
-            사업에 레버리지하는 완전 가이드
+            ChatGPT는 <em>답</em>만 해요.<br />
+            OpenClaw는 <strong>실행</strong>합니다.
           </div>
-          <div className="by-line">16개 챕터 + 부록 &middot; 실전 설정 파일 포함 &middot; 복사-붙여넣기 OK</div>
+          <div className="hero-desc">
+            텔레그램으로 "아침 브리핑 보내줘"라고 말하면,<br />
+            매일 정해진 시간에 이메일·캘린더·뉴스를 정리해서 보내주는 AI.
+          </div>
+          <div className="by-line">by AI싱크클럽 &middot; 복사-붙여넣기로 시작</div>
         </div>
 
-        {/* Features */}
-        <div className="features">
-          <div className="feature-card">
-            <div className="feature-icon f1">🐾</div>
-            <h3>처음이어도 괜찮아요</h3>
-            <p>코딩 경험이 없어도 따라할 수 있습니다. 모든 설정 파일은 복사-붙여넣기로 시작합니다.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon f2">⚡</div>
-            <h3>실전 중심 가이드</h3>
-            <p>실제 운영 사례와 실수 사례 기반. 이론이 아닌 바로 쓸 수 있는 지식을 담았습니다.</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon f3">👥</div>
-            <h3>AI 팀을 만듭니다</h3>
-            <p>혼자 일하는 AI가 아닌, 5인 에이전트 팀으로 사업을 레버리지하는 시스템을 구축합니다.</p>
+        {/* What is OpenClaw — 1줄 설명 */}
+        <div className="what-is">
+          <h2>OpenClaw가 뭔가요?</h2>
+          <div className="what-is-grid">
+            <div className="what-is-card">
+              <div className="what-is-label">ChatGPT / Claude</div>
+              <div className="what-is-desc">물어보면 답해줌<br /><span>대화가 끝나면 잊어버림</span></div>
+            </div>
+            <div className="what-is-vs">→</div>
+            <div className="what-is-card active">
+              <div className="what-is-label">OpenClaw</div>
+              <div className="what-is-desc">시키면 직접 실행<br /><span>24시간 혼자 일함, 기억도 함</span></div>
+            </div>
           </div>
         </div>
 
-        {/* Prerequisites */}
-        <div className="prereq">
-          <h3>📋 시작하기 전에 준비할 것</h3>
-          <ul>
-            <li><span className="prereq-check">✓</span>Mac (M1 이상) 또는 Linux 서버</li>
-            <li><span className="prereq-check">✓</span>텔레그램 계정</li>
-            <li><span className="prereq-check">✓</span>Anthropic 또는 OpenAI API Key</li>
-            <li><span className="prereq-check">✓</span>터미널 기본 사용법 (복사-붙여넣기 수준 OK)</li>
-          </ul>
+        {/* 비용 미리보기 */}
+        <div className="cost-preview">
+          <h3>💰 비용은?</h3>
+          <div className="cost-chips">
+            <div className="cost-chip"><strong>무료</strong><span>Ollama 로컬 모델</span></div>
+            <div className="cost-chip"><strong>월 1.5~4만원</strong><span>가벼운 사용</span></div>
+            <div className="cost-chip"><strong>월 13~26만원</strong><span>5인 팀 운영</span></div>
+          </div>
+          <p className="cost-note">직원 인건비의 1/10. 처음엔 $5만 충전해서 테스트 가능.</p>
         </div>
 
-        {/* Roadmap */}
-        <div className="roadmap">
-          <h2 className="roadmap-title">학습 로드맵</h2>
-          <div className="roadmap-grid">
-            <div className="roadmap-card" data-p="1" onClick={() => onStart(2)}>
-              <div className="roadmap-badge">1</div>
-              <div className="roadmap-info">
-                <h3>에이전트의 집 구경</h3>
-                <p>워크스페이스, 정체성, 규칙, 채널 연결</p>
-                <div className="roadmap-chapters">Ch.01 ~ 04</div>
+        {/* 3단계 로드맵 — 간결하게 */}
+        <div className="roadmap-simple">
+          <h2>3단계로 시작합니다</h2>
+          <div className="steps">
+            <div className="step" onClick={() => onStart(1)}>
+              <div className="step-num">1</div>
+              <div className="step-info">
+                <h3>설치하고 "안녕" 보내기</h3>
+                <p>5분이면 텔레그램에서 AI와 대화 가능</p>
               </div>
+              <div className="step-arrow">→</div>
             </div>
-            <div className="roadmap-card" data-p="2" onClick={() => onStart(6)}>
-              <div className="roadmap-badge">2</div>
-              <div className="roadmap-info">
-                <h3>혼자 움직이게 하기</h3>
-                <p>자동 실행, 스킬, 메모리, 멀티에이전트</p>
-                <div className="roadmap-chapters">Ch.05 ~ 08</div>
+            <div className="step" onClick={() => onStart(2)}>
+              <div className="step-num">2</div>
+              <div className="step-info">
+                <h3>성격 정하고 규칙 세우기</h3>
+                <p>SOUL.md에 성격, AGENTS.md에 규칙 작성</p>
               </div>
+              <div className="step-arrow">→</div>
             </div>
-            <div className="roadmap-card" data-p="3" onClick={() => onStart(10)}>
-              <div className="roadmap-badge">3</div>
-              <div className="roadmap-info">
-                <h3>팀과 세상으로</h3>
-                <p>외부 연동, 보안, 비용 관리</p>
-                <div className="roadmap-chapters">Ch.09 ~ 11</div>
+            <div className="step" onClick={() => onStart(6)}>
+              <div className="step-num">3</div>
+              <div className="step-info">
+                <h3>혼자 움직이게 만들기</h3>
+                <p>매일 아침 브리핑, 자동 모니터링 설정</p>
               </div>
-            </div>
-            <div className="roadmap-card" data-p="4" onClick={() => onStart(13)}>
-              <div className="roadmap-badge">4</div>
-              <div className="roadmap-info">
-                <h3>실전 팀 구축</h3>
-                <p>5인 팀 구축, Claude Code 하이브리드, 수익화</p>
-                <div className="roadmap-chapters">Ch.12 ~ 14</div>
-              </div>
+              <div className="step-arrow">→</div>
             </div>
           </div>
         </div>
@@ -175,16 +155,48 @@ function IntroPage({ onStart }: { onStart: (i: number) => void }) {
         {/* CTA */}
         <div className="cta">
           <button className="cta-btn" onClick={() => onStart(1)}>
-            시작하기 전에 읽기 <span className="arrow">→</span>
+            Ch.00 — 설치부터 시작하기 <span className="arrow">→</span>
           </button>
+          <p className="cta-sub">코딩 경험 없어도 됩니다. 5분이면 첫 응답을 받습니다.</p>
         </div>
+
+        {/* 전체 목차 (접힌 상태) */}
+        <details className="full-toc">
+          <summary>전체 목차 보기 (16개 챕터 + 부록 3개)</summary>
+          <div className="toc-grid">
+            <div className="toc-phase">
+              <h4>준비</h4>
+              <div className="toc-item" onClick={() => onStart(1)}>Ch.00 시작하기 전에</div>
+            </div>
+            <div className="toc-phase">
+              <h4>Phase 1: 에이전트의 집</h4>
+              <div className="toc-item" onClick={() => onStart(2)}>Ch.01 워크스페이스</div>
+              <div className="toc-item" onClick={() => onStart(3)}>Ch.02 SOUL.md — 정체성</div>
+              <div className="toc-item" onClick={() => onStart(4)}>Ch.03 AGENTS.md — 규칙</div>
+              <div className="toc-item" onClick={() => onStart(5)}>Ch.04 채널 연결</div>
+            </div>
+            <div className="toc-phase">
+              <h4>Phase 2: 자동화</h4>
+              <div className="toc-item" onClick={() => onStart(6)}>Ch.05 자동 실행</div>
+              <div className="toc-item" onClick={() => onStart(7)}>Ch.06 스킬 부여</div>
+              <div className="toc-item" onClick={() => onStart(8)}>Ch.07 메모리</div>
+              <div className="toc-item" onClick={() => onStart(9)}>Ch.08 멀티에이전트</div>
+            </div>
+            <div className="toc-phase">
+              <h4>Phase 3~4: 실전</h4>
+              <div className="toc-item" onClick={() => onStart(10)}>Ch.09~11 외부연동·보안·비용</div>
+              <div className="toc-item" onClick={() => onStart(13)}>Ch.12~14 팀 구축·하이브리드·수익화</div>
+              <div className="toc-item" onClick={() => onStart(16)}>부록 A·C·F</div>
+            </div>
+          </div>
+        </details>
       </div>
     </div>
   );
 }
 
 /* ============================================================
-   SIDEBAR
+   SIDEBAR — 아코디언: 현재 Phase만 열림
    ============================================================ */
 function Sidebar({ current, onSelect, open, onClose, theme, onToggleTheme }: {
   current: number;
@@ -194,7 +206,24 @@ function Sidebar({ current, onSelect, open, onClose, theme, onToggleTheme }: {
   theme: string;
   onToggleTheme: () => void;
 }) {
-  let lastPhase = "";
+  // Group chapters by phase
+  const phases = useMemo(() => {
+    const map: { phase: string; label: string; items: { idx: number; ch: Chapter }[] }[] = [];
+    let currentPhase = "";
+    chapters.forEach((ch, i) => {
+      if (i === 0) return; // skip intro
+      if (ch.phaseLabel && ch.phase !== currentPhase) {
+        currentPhase = ch.phase;
+        map.push({ phase: ch.phase, label: ch.phaseLabel, items: [] });
+      }
+      if (map.length > 0) {
+        map[map.length - 1].items.push({ idx: i, ch });
+      }
+    });
+    return map;
+  }, []);
+
+  const currentPhase = current > 0 ? chapters[current]?.phase : "0";
 
   return (
     <nav className={`sidebar ${open ? "open" : ""}`}>
@@ -203,7 +232,6 @@ function Sidebar({ current, onSelect, open, onClose, theme, onToggleTheme }: {
           <div className="sidebar-brand-icon">OC</div>
           <div className="sidebar-brand-text">
             <h1>OpenClaw 매뉴얼</h1>
-            <span>AI 에이전트 팀 구축 가이드</span>
           </div>
         </div>
       </div>
@@ -218,21 +246,36 @@ function Sidebar({ current, onSelect, open, onClose, theme, onToggleTheme }: {
         {/* Home */}
         <div className={`nav-item ${current === 0 ? "active" : ""}`} onClick={() => { onSelect(0); onClose(); }}>
           <span className="nav-num" style={{ fontSize: 13 }}>🏠</span>
-          <span className="nav-label">시작하기</span>
+          <span className="nav-label">홈</span>
         </div>
 
-        {chapters.slice(1).map((ch, idx) => {
-          const i = idx + 1;
-          const showPhase = ch.phaseLabel && ch.phase !== lastPhase;
-          if (ch.phaseLabel) lastPhase = ch.phase;
+        {phases.map((p) => {
+          const isOpen = p.phase === currentPhase || p.phase === "0";
+          const hasActive = p.items.some(item => item.idx === current);
           return (
-            <React.Fragment key={ch.id}>
-              {showPhase && <div className="sidebar-phase-label" data-phase={ch.phase}>{ch.phaseLabel}</div>}
-              <div className={`nav-item ${i === current ? "active" : ""}`} onClick={() => { onSelect(i); onClose(); }}>
-                <span className="nav-num">{ch.num}</span>
-                <span className="nav-label">{ch.title}</span>
+            <div key={p.phase} className="sidebar-phase-group">
+              <div
+                className={`sidebar-phase-header ${hasActive ? "active" : ""}`}
+                onClick={() => { onSelect(p.items[0].idx); onClose(); }}
+              >
+                <span className="phase-toggle">{isOpen || hasActive ? "▾" : "▸"}</span>
+                <span>{p.label}</span>
               </div>
-            </React.Fragment>
+              {(isOpen || hasActive) && (
+                <div className="sidebar-phase-items">
+                  {p.items.map(({ idx, ch }) => (
+                    <div
+                      key={ch.id}
+                      className={`nav-item ${idx === current ? "active" : ""}`}
+                      onClick={() => { onSelect(idx); onClose(); }}
+                    >
+                      <span className="nav-num">{ch.num}</span>
+                      <span className="nav-label">{ch.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
@@ -241,40 +284,42 @@ function Sidebar({ current, onSelect, open, onClose, theme, onToggleTheme }: {
 }
 
 /* ============================================================
-   CHAPTER NAV
+   CHAPTER NAV — 완료 배너 추가
    ============================================================ */
 function ChapterNav({ current, onSelect }: { current: number; onSelect: (i: number) => void }) {
   const prev = current > 0 ? chapters[current - 1] : null;
   const next = current < chapters.length - 1 ? chapters[current + 1] : null;
+  const ch = chapters[current];
 
   return (
-    <div className="chapter-nav">
-      {prev ? (
-        <div className="ch-nav-btn prev" onClick={() => onSelect(current - 1)}>
-          <span className="ch-nav-label">← 이전</span>
-          <span className="ch-nav-title">{prev.num ? `Ch.${prev.num}` : ""} {prev.title}</span>
+    <div className="chapter-nav-wrap">
+      {/* 완료 배너 */}
+      {next && (
+        <div className="chapter-complete" onClick={() => onSelect(current + 1)}>
+          ✅ {ch.num ? `Ch.${ch.num}` : ""} {ch.title} 완료! &nbsp;→&nbsp; 다음: {next.num ? `Ch.${next.num}` : ""} {next.title}
         </div>
-      ) : <div />}
-      {next ? (
-        <div className="ch-nav-btn next" onClick={() => onSelect(current + 1)}>
-          <span className="ch-nav-label">다음 →</span>
-          <span className="ch-nav-title">{next.num ? `Ch.${next.num}` : ""} {next.title}</span>
-        </div>
-      ) : <div />}
+      )}
+      <div className="chapter-nav">
+        {prev ? (
+          <div className="ch-nav-btn prev" onClick={() => onSelect(current - 1)}>
+            <span className="ch-nav-label">← 이전</span>
+            <span className="ch-nav-title">{prev.num ? `Ch.${prev.num}` : ""} {prev.title}</span>
+          </div>
+        ) : <div />}
+        {next ? (
+          <div className="ch-nav-btn next" onClick={() => onSelect(current + 1)}>
+            <span className="ch-nav-label">다음 →</span>
+            <span className="ch-nav-title">{next.num ? `Ch.${next.num}` : ""} {next.title}</span>
+          </div>
+        ) : <div />}
+      </div>
     </div>
   );
 }
 
 /* ============================================================
-   APP
+   LOCK SCREEN
    ============================================================ */
-const PASS_HASH = "a3f5c8d2"; // simple hash of sync2026
-function simpleHash(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-  return (h >>> 0).toString(16).slice(0, 8);
-}
-
 function LockScreen({ onUnlock }: { onUnlock: () => void }) {
   const [pw, setPw] = useState("");
   const [error, setError] = useState(false);
@@ -295,7 +340,7 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       flexDirection: "column", gap: 20,
     }}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 32, marginBottom: 8, fontFamily: "var(--font-display)" }}>🔒</div>
+        <div style={{ fontSize: 32, marginBottom: 8 }}>🔒</div>
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4, fontFamily: "var(--font-display)" }}>OpenClaw 실전 매뉴얼</h2>
         <p style={{ color: "var(--text-muted)", fontSize: 14 }}>비밀번호를 입력하세요</p>
       </div>
@@ -308,11 +353,9 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
           autoFocus
           style={{
             padding: "10px 16px", fontSize: 15, borderRadius: 8,
-            border: `1px solid ${error ? "var(--danger, #b34040)" : "var(--border)"}`,
+            border: `1px solid ${error ? "#b34040" : "var(--border)"}`,
             background: "var(--bg-card, #fff)", color: "var(--text)",
-            outline: "none", width: 220,
-            fontFamily: "var(--font-body)",
-            transition: "border-color 0.2s",
+            outline: "none", width: 220, fontFamily: "var(--font-body)",
           }}
         />
         <button type="submit" style={{
@@ -321,12 +364,15 @@ function LockScreen({ onUnlock }: { onUnlock: () => void }) {
           cursor: "pointer", fontFamily: "var(--font-body)",
         }}>입장</button>
       </form>
-      {error && <p style={{ color: "var(--danger, #b34040)", fontSize: 13 }}>비밀번호가 틀렸습니다</p>}
+      {error && <p style={{ color: "#b34040", fontSize: 13 }}>비밀번호가 틀렸습니다</p>}
       <p style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 8 }}>by AI싱크클럽</p>
     </div>
   );
 }
 
+/* ============================================================
+   APP
+   ============================================================ */
 function App() {
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem("oc-unlocked") === "1");
   const [current, setCurrent] = useState(0);
@@ -347,27 +393,21 @@ function App() {
     window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
   }, []);
 
-  // Load markdown — try inline data first, then fetch
   useEffect(() => {
     if (current === 0) { setContent(""); return; }
     const file = chapters[current]?.file;
     if (!file) return;
-
-    // Try inline chapters (static build)
     const inlineChapters = (window as any).__CHAPTERS__ as { file: string; content: string }[] | undefined;
     if (inlineChapters) {
       const found = inlineChapters.find(c => c.file === file);
       if (found) { setContent(found.content); return; }
     }
-
-    // Fallback to fetch (dev server)
     fetch(`/manual/${file}`)
       .then(r => r.text())
       .then(setContent)
       .catch(() => setContent("# 로딩 중..."));
   }, [current]);
 
-  // Scroll progress
   useEffect(() => {
     const fn = () => {
       const h = document.documentElement.scrollHeight - window.innerHeight;
@@ -386,7 +426,6 @@ function App() {
     <>
       <div className="progress-bar" style={{ width: `${scrollProgress}%` }} />
 
-      {/* Mobile top bar */}
       <div className="mobile-bar">
         <button onClick={() => setSidebarOpen(true)}>☰</button>
         <h1>OpenClaw 매뉴얼</h1>
